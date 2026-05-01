@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Configuration — CDN Yudaverse</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-primary: #050d1a;
+    --bg-secondary: #0a1628;
+    --bg-card: #0d1e35;
+    --bg-input: #091422;
+    --accent: #1e90ff;
+    --accent-bright: #3da8ff;
+    --accent-glow: rgba(30,144,255,0.18);
+    --accent-border: rgba(30,144,255,0.35);
+    --text-primary: #e8f4ff;
+    --text-secondary: #7ba8cc;
+    --text-muted: #4a6f91;
+    --border: rgba(30,144,255,0.15);
+    --border-strong: rgba(30,144,255,0.3);
+    --success: #22d3a0;
+    --danger: #ff5f6d;
+    --warning: #f5a623;
+    --radius: 10px;
+    --radius-lg: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; }
+
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 2rem; height: 64px;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-brand { display: flex; align-items: center; gap: 12px; font-size: 1rem; font-weight: 700; color: var(--text-primary); text-decoration: none; }
+  .nav-brand-name span:first-child { font-size: 1rem; font-weight: 700; color: var(--text-primary); display: block; line-height: 1.2; }
+  .nav-brand-name span:last-child { font-size: 10px; font-weight: 500; color: var(--accent-bright); text-transform: uppercase; letter-spacing: 0.08em; display: block; }
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+  .nav-back { font-size: 12px; color: var(--text-muted); text-decoration: none; padding: 6px 14px; border: 1px solid var(--border); border-radius: 6px; transition: all .2s; }
+  .nav-back:hover { color: var(--accent-bright); border-color: var(--accent-border); background: var(--accent-glow); }
+
+  /* LOGIN */
+  #login-screen { flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+  .login-card { background: var(--bg-card); border: 1px solid var(--border-strong); border-radius: var(--radius-lg); padding: 2.5rem 2rem; width: 100%; max-width: 400px; box-shadow: 0 8px 40px rgba(0,0,0,0.4); }
+  .login-logo-wrap { text-align: center; margin-bottom: 1.8rem; }
+  .login-title { font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-top: 12px; }
+  .login-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+  .form-group { margin-bottom: 1rem; }
+  .form-label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .05em; font-weight: 500; }
+  .form-input { width: 100%; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-primary); border-radius: var(--radius); padding: 10px 14px; font-size: 13px; font-family: inherit; outline: none; transition: border-color .2s; }
+  .form-input:focus { border-color: var(--accent-border); }
+  .form-input.mono { font-family: 'JetBrains Mono', monospace; letter-spacing: 0.02em; }
+
+  .login-btn { width: 100%; padding: 11px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius); font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all .2s; margin-top: 0.5rem; box-shadow: 0 4px 14px rgba(30,144,255,0.3); }
+  .login-btn:hover { background: var(--accent-bright); transform: translateY(-1px); }
+  .login-error { background: rgba(255,95,109,.1); border: 1px solid rgba(255,95,109,.3); color: var(--danger); border-radius: var(--radius); padding: 10px 14px; font-size: 12px; margin-bottom: 1rem; display: none; text-align: center; }
+  .login-error.show { display: block; }
+
+  /* CONFIG */
+  #config-screen { display: none; flex: 1; flex-direction: column; }
+  #config-screen.active { display: flex; }
+  .config-container { max-width: 640px; margin: 0 auto; padding: 3rem 2rem; width: 100%; }
+  .config-header { margin-bottom: 2rem; }
+  .config-title { font-size: 1.4rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+  .config-sub { font-size: 13px; color: var(--text-muted); }
+  .config-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 2rem; margin-bottom: 1.5rem; }
+  .config-card-title { font-size: 13px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 1.2rem; padding-bottom: 0.8rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+  .save-btn { width: 100%; padding: 11px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius); font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all .2s; box-shadow: 0 4px 14px rgba(30,144,255,0.25); margin-top: 0.5rem; }
+  .save-btn:hover { background: var(--accent-bright); transform: translateY(-1px); }
+  .logout-btn { padding: 7px 16px; border: 1px solid rgba(255,95,109,.3); background: transparent; color: var(--danger); border-radius: 7px; font-size: 12px; cursor: pointer; font-family: inherit; transition: all .2s; }
+  .logout-btn:hover { background: rgba(255,95,109,.1); }
+  .success-banner { background: rgba(34,211,160,.1); border: 1px solid rgba(34,211,160,.3); color: var(--success); border-radius: var(--radius); padding: 10px 16px; font-size: 13px; margin-bottom: 1.5rem; display: none; align-items: center; gap: 8px; }
+  .success-banner.show { display: flex; }
+  .hint-text { font-size: 11px; color: var(--text-muted); margin-top: 5px; line-height: 1.5; }
+  .hint-text a { color: var(--accent-bright); text-decoration: none; }
+  .hint-text a:hover { text-decoration: underline; }
+  .pw-wrap { position: relative; }
+  .pw-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 14px; padding: 0; line-height: 1; }
+  .pw-toggle:hover { color: var(--text-secondary); }
+
+  /* PANDUAN STEPS */
+  .steps { counter-reset: step-counter; margin-top: 0; }
+  .step { display: flex; gap: 14px; margin-bottom: 1.2rem; align-items: flex-start; }
+  .step-num {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--accent); color: #fff;
+    font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+  }
+  .step-body { flex: 1; }
+  .step-title { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 3px; }
+  .step-desc { font-size: 12px; color: var(--text-muted); line-height: 1.6; }
+  .step-desc a { color: var(--accent-bright); text-decoration: none; }
+  .step-desc a:hover { text-decoration: underline; }
+  .step-desc code { background: rgba(30,144,255,.1); border: 1px solid var(--border); padding: 1px 6px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent-bright); }
+
+  /* VERCEL URL PREVIEW */
+  .url-preview {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent-bright);
+    margin-top: 8px;
+    word-break: break-all;
+    min-height: 38px;
+  }
+  .url-preview span { color: var(--text-muted); }
+
+  /* TEST CONNECTION */
+  .test-btn { padding: 8px 18px; background: transparent; border: 1px solid var(--border-strong); color: var(--text-secondary); border-radius: var(--radius); font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; transition: all .2s; margin-top: 0.5rem; }
+  .test-btn:hover { border-color: var(--accent-border); color: var(--accent-bright); background: var(--accent-glow); }
+  .test-result { margin-top: 10px; font-size: 12px; display: none; padding: 8px 12px; border-radius: 8px; }
+  .test-result.ok { background: rgba(34,211,160,.1); border: 1px solid rgba(34,211,160,.3); color: var(--success); display: block; }
+  .test-result.err { background: rgba(255,95,109,.1); border: 1px solid rgba(255,95,109,.3); color: var(--danger); display: block; }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg-primary); }
+  ::-webkit-scrollbar-thumb { background: #1a3557; border-radius: 99px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="index.html">
+    <div class="nav-brand-name">
+      <span>CDN Yudaverse</span>
+      <span>Konfigurasi</span>
+    </div>
+  </a>
+  <div class="nav-right">
+    <button class="logout-btn" id="logout-btn" style="display:none;" onclick="doLogout()">↩ Logout</button>
+    <a class="nav-back" href="index.html">← Kembali</a>
+  </div>
+</nav>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo-wrap">
+      <div style="font-size:3rem;">🔒</div>
+      <div class="login-title">Masuk ke Konfigurasi</div>
+      <div class="login-sub">cdn-yudaverse — GitHub Storage</div>
+    </div>
+    <div class="login-error" id="login-error">⚠ Username atau password salah.</div>
+    <div class="form-group">
+      <label class="form-label">Username</label>
+      <input class="form-input" type="text" id="inp-username" placeholder="Masukkan username..." autocomplete="username">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <div class="pw-wrap">
+        <input class="form-input mono" type="password" id="inp-password" placeholder="Masukkan password..." autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+        <button class="pw-toggle" onclick="togglePw()" type="button" id="pw-eye">👁</button>
+      </div>
+    </div>
+    <button class="login-btn" onclick="doLogin()">🔒 Masuk</button>
+  </div>
+</div>
+
+<!-- CONFIG SCREEN -->
+<div id="config-screen">
+  <div class="config-container">
+    <div class="config-header">
+      <div class="config-title">⚙ Konfigurasi GitHub CDN</div>
+      <div class="config-sub">Hubungkan CDN Yudaverse ke GitHub repository kamu</div>
+    </div>
+
+    <div class="success-banner" id="success-banner">✓ Konfigurasi berhasil disimpan!</div>
+
+    <!-- PANDUAN BUAT PAT -->
+    <div class="config-card">
+      <div class="config-card-title">📋 Panduan: Cara Buat GitHub Token (PAT)</div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Login ke GitHub</div>
+            <div class="step-desc">Buka <a href="https://github.com" target="_blank">github.com</a> dan pastikan sudah login ke akun kamu.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Buka Settings → Developer Settings</div>
+            <div class="step-desc">Klik foto profil kamu (kanan atas) → <strong>Settings</strong> → scroll ke bawah → <strong>Developer settings</strong>.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Buat Token Baru</div>
+            <div class="step-desc">Pilih <strong>Personal access tokens → Tokens (classic)</strong> → klik <strong>Generate new token (classic)</strong>.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <div class="step-title">Isi & Pilih Permission</div>
+            <div class="step-desc">
+              Beri nama token (contoh: <code>cdn-yudaverse</code>), atur expiration sesuai kebutuhan.<br>
+              Centang permission: <code>repo</code> (full control of private repositories) — ini mencakup semua yang dibutuhkan.
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <div class="step-title">Salin Token</div>
+            <div class="step-desc">Klik <strong>Generate token</strong>, lalu <strong>salin token-nya sekarang</strong> — token hanya ditampilkan sekali! Paste di kolom Token di bawah.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">6</div>
+          <div class="step-body">
+            <div class="step-title">Buat Repository untuk CDN</div>
+            <div class="step-desc">Buat repo baru di GitHub (bisa public atau private). Pastikan sudah ada minimal 1 commit (init) agar branch <code>main</code> tersedia. Nama repo bebas, contoh: <code>cdn-assets</code>.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORM CONFIG -->
+    <div class="config-card">
+      <div class="config-card-title">🐙 GitHub Settings</div>
+
+      <div class="form-group">
+        <label class="form-label">GitHub Username</label>
+        <input class="form-input" type="text" id="cfg-username" placeholder="contoh: yudaverse" oninput="updatePreview()">
+        <div class="hint-text">Username GitHub kamu (bukan email)</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Nama Repository</label>
+        <input class="form-input" type="text" id="cfg-repo" placeholder="contoh: cdn-assets" oninput="updatePreview()">
+        <div class="hint-text">Nama repo yang akan jadi tempat penyimpanan file</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Branch</label>
+        <input class="form-input" type="text" id="cfg-branch" placeholder="main" oninput="updatePreview()">
+        <div class="hint-text">Default: <code style="font-size:11px;color:var(--accent-bright);font-family:'JetBrains Mono',monospace;">main</code> — isi sesuai branch repo kamu</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Folder (opsional)</label>
+        <input class="form-input" type="text" id="cfg-folder" placeholder="contoh: uploads (kosongkan jika tidak pakai folder)" oninput="updatePreview()">
+        <div class="hint-text">Folder di dalam repo. Kosongkan jika ingin file disimpan di root repo.</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Personal Access Token (PAT)</label>
+        <div class="pw-wrap">
+          <input class="form-input mono" type="password" id="cfg-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+          <button class="pw-toggle" onclick="toggleToken()" type="button" id="token-eye">👁</button>
+        </div>
+        <div class="hint-text">Token hanya disimpan di localStorage browser kamu, tidak dikirim ke server manapun selain GitHub.</div>
+      </div>
+
+      <div style="margin-bottom:1rem;">
+        <label class="form-label">Preview URL File</label>
+        <div class="url-preview" id="url-preview"><span>Isi username, repo, branch, dan folder untuk melihat preview URL</span></div>
+      </div>
+
+      <button class="test-btn" onclick="testConnection()">🔌 Test Koneksi ke GitHub</button>
+      <div class="test-result" id="test-result"></div>
+
+      <button class="save-btn" onclick="saveConfig()" style="margin-top:1rem;">💾 Simpan Konfigurasi</button>
+    </div>
+
+    <!-- INFO -->
+    <div class="config-card">
+      <div class="config-card-title">ℹ️ Informasi</div>
+      <div style="font-size:13px;color:var(--text-secondary);line-height:1.8;">
+        Semua konfigurasi disimpan di <span style="font-family:'JetBrains Mono',monospace;color:var(--accent-bright);font-size:12px;">localStorage</span> browser kamu.<br>
+        Data tidak dikirim ke server manapun — hanya ke GitHub API saat upload.<br><br>
+        <span style="color:var(--text-muted);font-size:12px;">
+          ⚠ <strong style="color:var(--text-secondary);">Batas ukuran file GitHub:</strong> Maksimal 100MB per file. File di atas 50MB disarankan menggunakan Git LFS.<br>
+          ⚠ <strong style="color:var(--text-secondary);">Repo publik:</strong> File bisa diakses siapa saja via raw URL. Gunakan repo private jika ingin akses terbatas (tapi raw URL tetap butuh token untuk diakses).
+        </span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const CORRECT_USERNAME = 'yudadmin3112';
+const CORRECT_PASSWORD = 'yudapratama56#';
+const SESSION_KEY      = 'yuda_cfg_session';
+
+function doLogin() {
+  const u = document.getElementById('inp-username').value.trim();
+  const p = document.getElementById('inp-password').value;
+  const err = document.getElementById('login-error');
+  if (u === CORRECT_USERNAME && p === CORRECT_PASSWORD) {
+    sessionStorage.setItem(SESSION_KEY, '1');
+    err.classList.remove('show');
+    showConfigScreen();
+  } else {
+    err.classList.add('show');
+    document.getElementById('inp-password').value = '';
+    document.getElementById('inp-password').focus();
+  }
+}
+function doLogout() {
+  sessionStorage.removeItem(SESSION_KEY);
+  document.getElementById('config-screen').classList.remove('active');
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('logout-btn').style.display = 'none';
+  document.getElementById('inp-username').value = '';
+  document.getElementById('inp-password').value = '';
+}
+function showConfigScreen() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('config-screen').classList.add('active');
+  document.getElementById('logout-btn').style.display = 'block';
+  loadConfig();
+}
+function loadConfig() {
+  document.getElementById('cfg-username').value = localStorage.getItem('yuda_gh_username') || '';
+  document.getElementById('cfg-repo').value     = localStorage.getItem('yuda_gh_repo')     || '';
+  document.getElementById('cfg-branch').value   = localStorage.getItem('yuda_gh_branch')   || 'main';
+  document.getElementById('cfg-folder').value   = localStorage.getItem('yuda_gh_folder')   || '';
+  document.getElementById('cfg-token').value    = localStorage.getItem('yuda_gh_token')    || '';
+  updatePreview();
+}
+function saveConfig() {
+  const username = document.getElementById('cfg-username').value.trim();
+  const repo     = document.getElementById('cfg-repo').value.trim();
+  const branch   = document.getElementById('cfg-branch').value.trim() || 'main';
+  const folder   = document.getElementById('cfg-folder').value.trim();
+  const token    = document.getElementById('cfg-token').value.trim();
+  if (!username || !repo || !token) {
+    alert('Username, Nama Repository, dan Token wajib diisi!');
+    return;
+  }
+  localStorage.setItem('yuda_gh_username', username);
+  localStorage.setItem('yuda_gh_repo',     repo);
+  localStorage.setItem('yuda_gh_branch',   branch);
+  localStorage.setItem('yuda_gh_folder',   folder);
+  localStorage.setItem('yuda_gh_token',    token);
+  const banner = document.getElementById('success-banner');
+  banner.classList.add('show');
+  setTimeout(() => banner.classList.remove('show'), 3500);
+}
+
+function updatePreview() {
+  const username = document.getElementById('cfg-username').value.trim();
+  const repo     = document.getElementById('cfg-repo').value.trim();
+  const branch   = document.getElementById('cfg-branch').value.trim() || 'main';
+  const folder   = document.getElementById('cfg-folder').value.trim();
+  const box      = document.getElementById('url-preview');
+  if (!username || !repo) {
+    box.innerHTML = '<span>Isi username dan repo untuk melihat preview URL</span>';
+    return;
+  }
+  const folderPath = folder ? folder.replace(/^\/|\/$/g, '') + '/' : '';
+  box.textContent = `https://raw.githubusercontent.com/${username}/${repo}/${branch}/${folderPath}namafile.jpg`;
+}
+
+async function testConnection() {
+  const username = document.getElementById('cfg-username').value.trim();
+  const repo     = document.getElementById('cfg-repo').value.trim();
+  const token    = document.getElementById('cfg-token').value.trim();
+  const result   = document.getElementById('test-result');
+
+  if (!username || !repo || !token) {
+    result.className = 'test-result err';
+    result.textContent = '⚠ Isi username, repo, dan token terlebih dahulu.';
+    return;
+  }
+
+  result.className = 'test-result ok';
+  result.textContent = '⏳ Menghubungkan ke GitHub...';
+
+  try {
+    const res = await fetch(`https://api.github.com/repos/${username}/${repo}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+      }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      result.className = 'test-result ok';
+      result.textContent = `✓ Terhubung! Repository "${data.full_name}" ditemukan. Visibility: ${data.private ? 'Private' : 'Public'}.`;
+    } else if (res.status === 401) {
+      result.className = 'test-result err';
+      result.textContent = '✕ Token tidak valid atau expired. Buat token baru di GitHub.';
+    } else if (res.status === 404) {
+      result.className = 'test-result err';
+      result.textContent = '✕ Repository tidak ditemukan. Cek username dan nama repo.';
+    } else {
+      result.className = 'test-result err';
+      result.textContent = `✕ Error: HTTP ${res.status}`;
+    }
+  } catch (e) {
+    result.className = 'test-result err';
+    result.textContent = '✕ Gagal terhubung: ' + e.message;
+  }
+}
+
+function togglePw() {
+  const inp = document.getElementById('inp-password');
+  const eye = document.getElementById('pw-eye');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  eye.textContent = inp.type === 'password' ? '👁' : '🙈';
+}
+function toggleToken() {
+  const inp = document.getElementById('cfg-token');
+  const eye = document.getElementById('token-eye');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  eye.textContent = inp.type === 'password' ? '👁' : '🙈';
+}
+
+if (sessionStorage.getItem(SESSION_KEY) === '1') showConfigScreen();
+</script>
+</body>
+</html>

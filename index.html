@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CDN Yudaverse</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-primary: #050d1a;
+    --bg-secondary: #0a1628;
+    --bg-card: #0d1e35;
+    --bg-card-hover: #112340;
+    --bg-input: #091422;
+    --accent: #1e90ff;
+    --accent-bright: #3da8ff;
+    --accent-glow: rgba(30,144,255,0.18);
+    --accent-border: rgba(30,144,255,0.35);
+    --text-primary: #e8f4ff;
+    --text-secondary: #7ba8cc;
+    --text-muted: #4a6f91;
+    --border: rgba(30,144,255,0.15);
+    --border-strong: rgba(30,144,255,0.3);
+    --success: #22d3a0;
+    --danger: #ff5f6d;
+    --warning: #f5a623;
+    --audio-color: #a855f7;
+    --radius: 10px;
+    --radius-lg: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Space Grotesk', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; }
+
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    height: 64px;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-decoration: none;
+    letter-spacing: -0.01em;
+  }
+  .nav-logo {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--accent-border);
+    box-shadow: 0 0 10px rgba(30,144,255,0.3);
+  }
+  .nav-brand-name { display: flex; flex-direction: column; line-height: 1.2; }
+  .nav-brand-name span:first-child { font-size: 1rem; font-weight: 700; color: var(--text-primary); }
+  .nav-brand-name span:last-child { font-size: 10px; font-weight: 500; color: var(--accent-bright); text-transform: uppercase; letter-spacing: 0.08em; }
+  .nav-config-link {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    transition: all .2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .nav-config-link:hover { color: var(--accent-bright); border-color: var(--accent-border); background: var(--accent-glow); }
+
+  .container { max-width: 860px; margin: 0 auto; padding: 3rem 2rem; }
+
+  .hero { text-align: center; margin-bottom: 2.5rem; }
+  .hero-title { font-size: 1.8rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+  .hero-title span { color: var(--accent-bright); }
+  .hero-sub { font-size: 14px; color: var(--text-muted); }
+
+  /* CONFIG WARNING */
+  .config-warn {
+    background: rgba(245,166,35,.08);
+    border: 1px solid rgba(245,166,35,.3);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--warning);
+    margin-bottom: 1.5rem;
+    display: none;
+    align-items: center;
+    gap: 10px;
+  }
+  .config-warn.show { display: flex; }
+  .config-warn a { color: var(--accent-bright); text-decoration: none; }
+  .config-warn a:hover { text-decoration: underline; }
+
+  .section-title { font-size: 13px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 1rem; }
+
+  .upload-box {
+    border: 2px dashed var(--border-strong);
+    border-radius: var(--radius-lg);
+    background: var(--bg-card);
+    padding: 3rem 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all .25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .upload-box:hover, .upload-box.drag-over { border-color: var(--accent); background: var(--accent-glow); }
+  .upload-icon { font-size: 2.8rem; margin-bottom: 14px; opacity: .65; }
+  .upload-text { font-size: 14px; color: var(--text-secondary); }
+  .upload-text strong { color: var(--accent-bright); }
+  .upload-text strong.purple { color: #c084fc; }
+  .upload-input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 18px;
+    padding: 10px 24px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .2s;
+    box-shadow: 0 4px 14px rgba(30,144,255,0.3);
+  }
+  .upload-btn:hover { background: var(--accent-bright); transform: translateY(-1px); box-shadow: 0 6px 18px rgba(30,144,255,0.4); }
+  .progress-bar-wrap { margin-top: 16px; height: 5px; background: rgba(255,255,255,.08); border-radius: 99px; overflow: hidden; display: none; }
+  .progress-bar { height: 100%; background: linear-gradient(90deg, #0d4f9e, #1e90ff); border-radius: 99px; width: 0; transition: width .3s; }
+  .upload-status { margin-top: 10px; font-size: 12px; color: var(--text-secondary); display: none; }
+
+  /* RESULT SECTION */
+  .result-section { margin-top: 2rem; display: none; }
+  .result-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.2rem 1.5rem;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: border-color .2s;
+  }
+  .result-card:hover { border-color: var(--accent-border); }
+  .result-thumb {
+    width: 44px; height: 44px;
+    border-radius: 8px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .result-thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+  .result-info { flex: 1; min-width: 0; }
+  .result-name { font-size: 13px; font-weight: 600; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .result-url { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 3px; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 10px; font-weight: 600; text-transform: uppercase; margin-top: 4px; }
+  .badge-image { background: rgba(30,144,255,.15); color: #5bb4ff; }
+  .badge-video { background: rgba(34,211,160,.12); color: #22d3a0; }
+  .badge-audio { background: rgba(168,85,247,.15); color: #c084fc; }
+  .badge-raw { background: rgba(245,166,35,.12); color: #f5a623; }
+  .result-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .icon-btn {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    transition: all .2s;
+  }
+  .icon-btn:hover { background: var(--accent-glow); color: var(--accent-bright); border-color: var(--accent-border); }
+  .icon-btn.danger:hover { background: rgba(255,95,109,.12); color: var(--danger); border-color: rgba(255,95,109,.3); }
+
+  .result-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+  .clear-btn {
+    padding: 5px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .2s;
+  }
+  .clear-btn:hover { color: var(--danger); border-color: rgba(255,95,109,.3); background: rgba(255,95,109,.07); }
+
+  .toast { position: fixed; bottom: 28px; right: 24px; z-index: 999; background: var(--bg-card); border: 1px solid var(--success); color: var(--success); padding: 10px 18px; border-radius: var(--radius); font-size: 13px; font-weight: 500; opacity: 0; transition: opacity .25s; pointer-events: none; }
+  .toast.show { opacity: 1; }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg-primary); }
+  ::-webkit-scrollbar-thumb { background: #1a3557; border-radius: 99px; }
+
+  /* MUSIC PLAYER BAR */
+  .player-bar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 200; background: var(--bg-secondary); border-top: 1px solid rgba(168,85,247,.3); padding: 10px 2rem; display: none; align-items: center; gap: 20px; }
+  .player-bar.active { display: flex; }
+  .player-thumb { width: 42px; height: 42px; border-radius: 8px; background: rgba(168,85,247,.2); border: 1px solid rgba(168,85,247,.3); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .player-info { flex: 0 0 200px; overflow: hidden; }
+  .player-title { font-size: 13px; font-weight: 600; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .player-format { font-size: 11px; color: #a855f7; margin-top: 2px; }
+  .player-controls { display: flex; align-items: center; gap: 10px; }
+  .play-btn-player { width: 38px; height: 38px; background: var(--accent); border: none; border-radius: 50%; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; transition: all .2s; }
+  .play-btn-player:hover { background: var(--accent-bright); transform: scale(1.05); }
+  .player-seek-wrap { flex: 1; display: flex; align-items: center; gap: 10px; }
+  .time-label { font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; min-width: 36px; }
+  .seek-bar { flex: 1; height: 4px; background: rgba(255,255,255,.1); border-radius: 99px; cursor: pointer; -webkit-appearance: none; outline: none; }
+  .seek-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); cursor: pointer; }
+  .vol-wrap { display: flex; align-items: center; gap: 8px; flex: 0 0 130px; }
+  .vol-icon { font-size: 14px; color: var(--text-muted); }
+  .vol-bar { flex: 1; height: 4px; background: rgba(255,255,255,.1); border-radius: 99px; cursor: pointer; -webkit-appearance: none; outline: none; }
+  .vol-bar::-webkit-slider-thumb { -webkit-appearance: none; width: 10px; height: 10px; border-radius: 50%; background: var(--text-secondary); cursor: pointer; }
+  .player-close-btn { width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; transition: all .2s; }
+  .player-close-btn:hover { color: var(--danger); border-color: rgba(255,95,109,.3); }
+  .pb-space { height: 80px; }
+
+  /* SIZE WARNING */
+  .size-warn { margin-top: 8px; font-size: 11px; color: rgba(245,166,35,.7); display: none; }
+  .size-warn.show { display: block; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="#">
+    <div class="nav-brand-name">
+      <span>CDN Yudaverse</span>
+      <span>GitHub Storage</span>
+    </div>
+  </a>
+  <a class="nav-config-link" href="configuration.html">⚙ Konfigurasi</a>
+</nav>
+
+<div class="container">
+  <div class="hero">
+    <div class="hero-title">Upload & Kelola <span>Media</span> Kamu</div>
+    <div class="hero-sub">Gambar, video, audio, dan file lainnya — tersimpan langsung di GitHub repo</div>
+  </div>
+
+  <!-- CONFIG WARNING -->
+  <div class="config-warn" id="config-warn">
+    ⚠ Konfigurasi GitHub belum lengkap. <a href="configuration.html">Isi dulu di sini →</a>
+  </div>
+
+  <!-- UPLOAD -->
+  <div class="upload-box" id="upload-box">
+    <input type="file" class="upload-input" id="file-input" multiple accept="image/*,video/*,audio/*,.pdf,.zip,.txt,.doc,.docx,.xls,.xlsx,.ppt,.pptx">
+    <div class="upload-icon">📁</div>
+    <div class="upload-text">Seret & lepas file di sini, atau <strong>klik untuk memilih</strong></div>
+    <div class="upload-text" style="margin-top:6px;font-size:12px;">Gambar 🖼 · Video 🎬 · <strong class="purple">Musik 🎵</strong> · PDF · ZIP · dan lainnya</div>
+    <button class="upload-btn" onclick="document.getElementById('file-input').click();event.stopPropagation();">⬆ Pilih File</button>
+    <div class="size-warn" id="size-warn">⚠ File besar (>50MB) mungkin gagal diupload ke GitHub karena batas ukuran file.</div>
+    <div class="progress-bar-wrap" id="progress-wrap"><div class="progress-bar" id="progress-bar"></div></div>
+    <div class="upload-status" id="upload-status"></div>
+  </div>
+
+  <!-- HASIL UPLOAD -->
+  <div class="result-section" id="result-section">
+    <div class="result-header">
+      <div class="section-title" style="margin:0;">Hasil Upload</div>
+      <button class="clear-btn" onclick="clearResults()">✕ Hapus Semua</button>
+    </div>
+    <div id="result-list"></div>
+  </div>
+
+  <div class="pb-space"></div>
+</div>
+
+<!-- PLAYER BAR (untuk audio) -->
+<div class="player-bar" id="player-bar">
+  <div class="player-thumb">🎵</div>
+  <div class="player-info">
+    <div class="player-title" id="player-title">—</div>
+    <div class="player-format" id="player-format">AUDIO</div>
+  </div>
+  <div class="player-controls">
+    <button class="play-btn-player" id="play-btn" onclick="togglePlay()">▶</button>
+  </div>
+  <div class="player-seek-wrap">
+    <span class="time-label" id="time-current">0:00</span>
+    <input type="range" class="seek-bar" id="seek-bar" min="0" max="100" value="0" step="0.1" oninput="seekTo(this.value)">
+    <span class="time-label" id="time-total">0:00</span>
+  </div>
+  <div class="vol-wrap">
+    <span class="vol-icon">🔊</span>
+    <input type="range" class="vol-bar" id="vol-bar" min="0" max="100" value="80" oninput="setVolume(this.value)">
+  </div>
+  <button class="player-close-btn" onclick="closePlayer()">✕</button>
+</div>
+
+<div class="toast" id="toast"></div>
+<audio id="audio-el"></audio>
+
+<script>
+// ============================================================
+// KONFIGURASI GITHUB — diambil dari localStorage (halaman config)
+// ============================================================
+function getConfig() {
+  return {
+    token:    localStorage.getItem('yuda_gh_token')    || '',
+    username: localStorage.getItem('yuda_gh_username') || '',
+    repo:     localStorage.getItem('yuda_gh_repo')     || '',
+    branch:   localStorage.getItem('yuda_gh_branch')   || 'main',
+    folder:   localStorage.getItem('yuda_gh_folder')   || '',
+  };
+}
+
+// Cek config saat load
+window.addEventListener('DOMContentLoaded', () => {
+  const cfg = getConfig();
+  if (!cfg.token || !cfg.username || !cfg.repo) {
+    document.getElementById('config-warn').classList.add('show');
+  }
+});
+
+// ============================================================
+// HELPERS
+// ============================================================
+let uploadedFiles = [];
+let currentTrackId = null;
+let isPlaying = false;
+const audio = document.getElementById('audio-el');
+
+function getTypeLabel(mime) {
+  if (!mime) return 'raw';
+  if (mime.startsWith('image')) return 'image';
+  if (mime.startsWith('video')) return 'video';
+  if (mime.startsWith('audio')) return 'audio';
+  return 'raw';
+}
+function getTypeIcon(t) {
+  return t === 'image' ? '🖼' : t === 'video' ? '🎬' : t === 'audio' ? '🎵' : '📄';
+}
+function formatSize(b) {
+  if (!b) return '—';
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
+  return (b / 1048576).toFixed(2) + ' MB';
+}
+function fmtTime(s) {
+  if (isNaN(s) || !isFinite(s)) return '0:00';
+  return Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
+}
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.borderColor = isError ? 'var(--danger)' : 'var(--success)';
+  t.style.color = isError ? 'var(--danger)' : 'var(--success)';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+function copyUrl(url) {
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(url).then(() => showToast('✓ URL disalin!')).catch(() => fallbackCopy(url));
+  } else { fallbackCopy(url); }
+}
+function fallbackCopy(url) {
+  const ta = document.createElement('textarea');
+  ta.value = url;
+  ta.style.cssText = 'position:fixed;left:-9999px;top:-9999px;opacity:0;';
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  try { document.execCommand('copy'); showToast('✓ URL disalin!'); }
+  catch (e) { showToast('⚠ Salin manual: ' + url, true); }
+  document.body.removeChild(ta);
+}
+
+// Buat nama file unik (random 8 karakter) + ekstensi asli
+function generateFilename(originalName) {
+  const ext = originalName.includes('.') ? '.' + originalName.split('.').pop().toLowerCase() : '';
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let rand = '';
+  for (let i = 0; i < 8; i++) rand += chars[Math.floor(Math.random() * chars.length)];
+  return rand + ext;
+}
+
+// File → Base64 string (tanpa header data:...)
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// ============================================================
+// UPLOAD KE GITHUB
+// ============================================================
+async function uploadToGitHub(file) {
+  const cfg = getConfig();
+  if (!cfg.token || !cfg.username || !cfg.repo) {
+    throw new Error('Konfigurasi GitHub belum lengkap. Isi di halaman Konfigurasi.');
+  }
+
+  const filename = generateFilename(file.name);
+  const folder   = cfg.folder ? cfg.folder.replace(/^\/|\/$/g, '') + '/' : '';
+  const path     = folder + filename;
+  const apiUrl   = `https://api.github.com/repos/${cfg.username}/${cfg.repo}/contents/${path}`;
+
+  // Konversi ke base64
+  const base64 = await fileToBase64(file);
+
+  const body = {
+    message: `Upload ${filename} via CDN Yudaverse`,
+    content: base64,
+    branch:  cfg.branch,
+  };
+
+  const res = await fetch(apiUrl, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${cfg.token}`,
+      'Content-Type':  'application/json',
+      'Accept':        'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || `HTTP ${res.status}`);
+  }
+
+  // Bangun URL raw (bisa diakses langsung)
+  const rawUrl = `https://raw.githubusercontent.com/${cfg.username}/${cfg.repo}/${cfg.branch}/${path}`;
+  return { filename, path, rawUrl, size: file.size };
+}
+
+// ============================================================
+// HANDLE FILES
+// ============================================================
+async function handleFiles(fileList) {
+  const cfg = getConfig();
+  if (!cfg.token || !cfg.username || !cfg.repo) {
+    showToast('⚠ Konfigurasi GitHub belum diisi!', true);
+    document.getElementById('config-warn').classList.add('show');
+    return;
+  }
+
+  const pw  = document.getElementById('progress-wrap');
+  const pb  = document.getElementById('progress-bar');
+  const st  = document.getElementById('upload-status');
+  const sw  = document.getElementById('size-warn');
+
+  // Cek apakah ada file besar
+  const hasBig = Array.from(fileList).some(f => f.size > 50 * 1024 * 1024);
+  sw.classList.toggle('show', hasBig);
+
+  pw.style.display = 'block'; st.style.display = 'block';
+  let uploaded = 0;
+
+  for (const file of fileList) {
+    st.textContent = `Mengupload ${file.name}... (${uploaded + 1}/${fileList.length})`;
+    try {
+      const data    = await uploadToGitHub(file);
+      const rtype   = getTypeLabel(file.type);
+      uploadedFiles.unshift({
+        id:       Date.now() + '' + Math.random(),
+        name:     file.name.replace(/\.[^.]+$/, ''),
+        format:   file.name.split('.').pop(),
+        rtype,
+        size:     data.size,
+        url:      data.rawUrl,
+        filename: data.filename,
+        date:     Date.now(),
+      });
+      uploaded++;
+      pb.style.width = Math.round((uploaded / fileList.length) * 100) + '%';
+    } catch (e) {
+      st.textContent = '⚠ Gagal: ' + e.message;
+      showToast('⚠ ' + e.message, true);
+      await new Promise(r => setTimeout(r, 2000));
+    }
+  }
+
+  renderResults();
+  pb.style.width = '100%';
+  st.textContent = `✓ ${uploaded} file berhasil diupload ke GitHub`;
+  showToast(`✓ ${uploaded} file diupload ke GitHub CDN`);
+  setTimeout(() => { pw.style.display = 'none'; pb.style.width = '0'; st.style.display = 'none'; }, 3000);
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function renderResults() {
+  const list    = document.getElementById('result-list');
+  const section = document.getElementById('result-section');
+  if (!uploadedFiles.length) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+  list.innerHTML = uploadedFiles.map(f => `
+    <div class="result-card" id="rc-${f.id}">
+      <div class="result-thumb">
+        ${f.rtype === 'image'
+          ? `<img src="${f.url}" alt="${f.name}" onerror="this.parentNode.innerHTML='🖼'">`
+          : getTypeIcon(f.rtype)}
+      </div>
+      <div class="result-info">
+        <div class="result-name" title="${f.name}.${f.format}">${f.name}.${f.format}</div>
+        <div class="result-url" title="${f.url}">${f.url}</div>
+        <span class="badge badge-${f.rtype}">${f.rtype}</span>
+        <span style="font-size:10px;color:var(--text-muted);margin-left:6px;">${formatSize(f.size)}</span>
+      </div>
+      <div class="result-actions">
+        ${f.rtype === 'audio'
+          ? `<button class="icon-btn" title="Putar" onclick="playAudio('${f.id}','${f.url}','${f.name}','${f.format}')">▶</button>`
+          : ''}
+        <button class="icon-btn" title="Salin URL" onclick="copyUrl('${f.url}')">⎘</button>
+        <button class="icon-btn" title="Buka di tab baru" onclick="window.open('${f.url}','_blank')">↗</button>
+        <button class="icon-btn danger" title="Hapus dari daftar" onclick="removeResult('${f.id}')">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function removeResult(id) {
+  if (id === currentTrackId) closePlayer();
+  uploadedFiles = uploadedFiles.filter(f => f.id !== id);
+  renderResults();
+}
+function clearResults() {
+  closePlayer();
+  uploadedFiles = [];
+  renderResults();
+}
+
+// Events upload
+document.getElementById('file-input').addEventListener('change', e => {
+  if (e.target.files.length) handleFiles(Array.from(e.target.files));
+});
+const uploadBox = document.getElementById('upload-box');
+uploadBox.addEventListener('dragover', e => { e.preventDefault(); uploadBox.classList.add('drag-over'); });
+uploadBox.addEventListener('dragleave', () => uploadBox.classList.remove('drag-over'));
+uploadBox.addEventListener('drop', e => {
+  e.preventDefault(); uploadBox.classList.remove('drag-over');
+  if (e.dataTransfer.files.length) handleFiles(Array.from(e.dataTransfer.files));
+});
+
+// ============================================================
+// AUDIO PLAYER
+// ============================================================
+function playAudio(id, url, name, format) {
+  currentTrackId = id;
+  audio.src = url;
+  audio.volume = document.getElementById('vol-bar').value / 100;
+  audio.play().catch(e => showToast('⚠ Gagal putar: ' + e.message, true));
+  isPlaying = true;
+  document.getElementById('player-bar').classList.add('active');
+  document.getElementById('player-title').textContent = name;
+  document.getElementById('player-format').textContent = format.toUpperCase();
+  document.getElementById('play-btn').textContent = '⏸';
+}
+function togglePlay() {
+  if (!currentTrackId) return;
+  if (isPlaying) { audio.pause(); isPlaying = false; document.getElementById('play-btn').textContent = '▶'; }
+  else { audio.play(); isPlaying = true; document.getElementById('play-btn').textContent = '⏸'; }
+}
+function seekTo(val) { if (audio.duration) audio.currentTime = (val / 100) * audio.duration; }
+function setVolume(val) { audio.volume = val / 100; }
+function closePlayer() {
+  audio.pause(); audio.src = ''; isPlaying = false; currentTrackId = null;
+  document.getElementById('player-bar').classList.remove('active');
+  document.getElementById('seek-bar').value = 0;
+  document.getElementById('time-current').textContent = '0:00';
+}
+audio.addEventListener('timeupdate', () => {
+  if (!audio.duration) return;
+  document.getElementById('seek-bar').value = (audio.currentTime / audio.duration) * 100;
+  document.getElementById('time-current').textContent = fmtTime(audio.currentTime);
+  document.getElementById('time-total').textContent = fmtTime(audio.duration);
+});
+audio.addEventListener('ended', () => { isPlaying = false; document.getElementById('play-btn').textContent = '▶'; });
+audio.addEventListener('error', () => { isPlaying = false; document.getElementById('play-btn').textContent = '▶'; showToast('⚠ Error memutar audio', true); });
+</script>
+</body>
+</html>

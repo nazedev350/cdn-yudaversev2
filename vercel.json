@@ -1,0 +1,10 @@
+{
+  "routes": [
+    { "src": "/", "dest": "/index.html" },
+    { "src": "/configuration", "dest": "/configuration.html" },
+    {
+      "src": "/(?!index\\.html|configuration\\.html)(.*)",
+      "dest": "https://raw.githubusercontent.com/nazedev350/cdn-yudaverse/main/$1"
+    }
+  ]
+}
