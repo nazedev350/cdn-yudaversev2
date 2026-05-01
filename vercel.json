@@ -4,7 +4,7 @@
     { "src": "/configuration", "dest": "/configuration.html" },
     {
       "src": "/(?!index\\.html|configuration\\.html)(.*)",
-      "dest": "https://raw.githubusercontent.com/nazedev350/cdn-yudaverse/main/$1"
+      "dest": "https://raw.githubusercontent.com/nazedev350/cdn-yudaversev2/main/$1"
     }
   ]
 }
